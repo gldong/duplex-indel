@@ -1,0 +1,14 @@
+__default__:
+    account: account_id ##CHANGE THIS
+    partition: "medium"
+    time: 1440 # in min
+    threads: 1
+    mem: 2000 # in MB
+    output: /log_dir/%j.out ##CHANGE THIS. Log files for intermediate jobs, so a directory in scratch might work better.
+
+split_bams:
+    partition: "short"
+merge_pileup:
+    partition: "short"
+indel_calling:
+    partition: "short"

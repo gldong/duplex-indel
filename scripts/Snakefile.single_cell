@@ -1,0 +1,163 @@
+import pandas as pd
+import os
+import re
+
+sample_name = config["sample_name"]
+base_dir = config["base_dir"]
+bulk_bam = config["bulk_bam"]
+bulk_bam_index = config["bulk_bam_index"]
+ref_fasta = config["ref_fasta"]
+fastq_R1 = config["fastq_R1"]
+fastq_R2 = config["fastq_R2"]
+gnomad_file = config["gnomad_file"]
+ref_mask_bed = config["ref_mask_bed"]
+barcodes_list = config["barcodes_list"]
+barcodes_dir = config["barcodes_dir"]
+pipeline_dir = config["pipeline_dir"]
+region_file = config["region_file"]
+
+df = pd.read_table(barcodes_list, header = None)
+barcodes = df[0].values
+num_bams = 2*len(barcodes)
+num_bams= len(barcodes)
+chromosomes = range(1,23)
+df = pd.read_table(region_file, header=None)
+regions = df[0].astype(str) + ":" + df[1].astype(str) + "-" + df[2].astype(str)
+
+print(sample_name)
+
+# Rule definitions
+
+rule all:
+    input:
+        final_calls=base_dir + "/" + sample_name + ".indel_calls.txt",
+        pre_mem_no_merging_bam = base_dir + "/" + sample_name + ".unmerged.mem.bam",
+        pre_mem_no_merging_bam_index = base_dir + "/" + sample_name + ".unmerged.mem.bam.bai"
+
+
+rule preprocess:
+    input:
+        fastq_R1 = fastq_R1,
+        fastq_R2 = fastq_R2,
+        ref_fasta = ref_fasta
+    threads: 6
+    resources:
+        runtime = 720,
+        mem_mb = 28000
+    output:
+        pre_mem_bam = base_dir + "/" + sample_name + ".mem.bam",
+        pre_mem_bam_index = base_dir + "/" + sample_name + ".mem.bam.bai"
+    shell:
+        "set -euo pipefail \n"
+        "module load gcc/6.2.0 bwa/0.7.17 samtools/1.13 sambamba/0.7.1 \n"
+        "ulimit -S -n 4096 \n"
+        "seqtk mergepe {input.fastq_R1} {input.fastq_R2} | "
+        "{pipeline_dir}/preprocess - | bwa mem -Cpt{threads} {input.ref_fasta} - | samtools view -uS - | "
+        "sambamba sort /dev/stdin -o /dev/stdout -m 8GB --tmpdir {base_dir}/tmp > {base_dir}/{sample_name}.mem.bam \n"
+        "samtools index {base_dir}/{sample_name}.mem.bam"
+
+
+rule preprocess_no_merging:
+    input:
+        fastq_R1 = fastq_R1,
+        fastq_R2 = fastq_R2,
+        ref_fasta = ref_fasta
+    threads: 4
+    resources:
+        runtime = 720, 
+        mem_mb = 28000
+    output:
+        pre_mem_no_merging_bam = base_dir + "/" + sample_name + ".unmerged.mem.bam",
+        pre_mem_no_merging_bam_index = base_dir + "/" + sample_name + ".unmerged.mem.bam.bai"
+    shell:
+        "set -euo pipefail \n"
+        "module load gcc/6.2.0 bwa/0.7.17 samtools/1.13 sambamba/0.7.1 \n"
+        "ulimit -S -n 4096 \n"
+        "seqtk mergepe {input.fastq_R1} {input.fastq_R2} | "
+         "{pipeline_dir}/preprocess-no-merging - | bwa mem -Cpt{threads} {input.ref_fasta} - | samtools view -uS - | "
+        "sambamba sort /dev/stdin -o /dev/stdout -m 8GB --tmpdir {base_dir}/tmp > {base_dir}/{sample_name}.unmerged.mem.bam \n"
+        "samtools index {base_dir}/{sample_name}.unmerged.mem.bam"
+
+
+rule split_bams:
+    input:
+        bam = base_dir+"/{bam_name}.bam",
+        barcode_files = expand(barcodes_dir+"/META-CS_fwdrev_barcodes_{barcode}.txt", barcode=barcodes)
+    params:
+        BCs = expand("{barcode}", barcode=barcodes)
+    threads: 4
+    resources:
+        runtime = 360, 
+        mem_mb = 1000
+    output:
+        barcode_bam = expand(base_dir+"/barcode_bams/{{bam_name}}.{barcode}.bam", barcode=barcodes),
+        barcode_bai = expand(base_dir+"/barcode_bams/{{bam_name}}.{barcode}.bam.bai", barcode=barcodes)
+    shell:
+        "module load gcc/6.2.0 samtools/1.13 \n"
+        "BCs=( {params.BCs} ) \n"
+        "files=( {input.barcode_files} ) \n"
+        "for i in ${{!BCs[@]}}; do \n"
+        "BC=${{BCs[i]}} \n"
+        "BC_file=${{files[i]}} \n"
+        "samtools view -b -h --tag-file BC:${{BC_file}} {input.bam} > {base_dir}/barcode_bams/{wildcards.bam_name}.${{BC}}.bam && "
+        "samtools index {base_dir}/barcode_bams/{wildcards.bam_name}.${{BC}}.bam & \n"
+        "if [ $(($i % 4)) -eq 3 ]; then wait; fi \n"
+        "done \n"
+        "wait"
+
+
+rule merge_pileup:
+    input:
+        sample_vcf_by_region = expand(base_dir + "/" + sample_name + ".region{region_num}.vcf", region_num=range(1, len(regions)+1))
+    threads: 1
+    resources:
+        runtime=60,
+        mem_mb=200
+    output:
+        sample_vcf=base_dir + "/" + sample_name + ".vcf.gz"
+    shell:
+        "module load gcc/6.2.0 htslib/1.9.0 bcftools/1.9 \n"
+        "bcftools concat -Oz -o {base_dir}/{sample_name}.vcf.gz {input.sample_vcf_by_region} && "
+        "bcftools index -t {base_dir}/{sample_name}.vcf.gz && "
+        "rm {input.sample_vcf_by_region}"
+
+
+rule pileup_by_region:
+    input:
+        mem_bams = expand("{base_dir}/barcode_bams/{sample_name}.mem.{barcode}.bam", base_dir=base_dir, sample_name=sample_name, barcode=barcodes),
+        mem_bams_index = expand("{base_dir}/barcode_bams/{sample_name}.mem.{barcode}.bam.bai", base_dir=base_dir, sample_name=sample_name, barcode=barcodes),
+        bulk_bam = bulk_bam,
+        bulk_bam_index = bulk_bam_index,
+        ref_mask_bed = ref_mask_bed,
+        ref_fasta = ref_fasta
+    params:
+        merged_bams=expand("{base_dir}/barcode_bams/{sample_name}.mem.{barcode}.bam", base_dir=base_dir, sample_name=sample_name, barcode=barcodes),
+        region_arg = lambda wildcards: regions[int(wildcards.region_num) - 1]
+    threads: 1
+    resources:
+        runtime = 720, 
+        mem_mb = 1000
+    output:
+        sample_vcf_by_region = base_dir + "/" + sample_name + ".region{region_num}.vcf"
+    shell:
+        "module load gcc/6.2.0 htslib/1.9.0 bcftools/1.9 \n"
+        "{pipeline_dir}/pileup -r {params.region_arg} -nL{num_bams} -P20 -b {input.ref_mask_bed} -C -q20,30 -Q20,30 -s4 -c -v -f {input.ref_fasta} {input.bulk_bam} {params.merged_bams} > {base_dir}/{sample_name}.region{wildcards.region_num}.vcf"
+
+
+rule indel_calling:
+    input:
+        vcf = base_dir + "/" + sample_name + ".vcf.gz",
+        gnomad_file = gnomad_file
+    threads: 1
+    resources:
+        runtime = 120, 
+        mem_mb = 3000 
+    output:
+        final_calls = base_dir + "/" + sample_name + ".indel_calls.txt"
+    shell:
+        "set -euo pipefail \n"
+        "module load gcc/6.2.0 \n"
+        "k8 {pipeline_dir}/call_indel.js -T3 -B1 -a4 -s2 -v {input.gnomad_file} -u {input.vcf} > {base_dir}/{sample_name}.indel_calls.txt" #flt_lv[T]=3: any overlap btw indel and merged window
+
+
+

@@ -1,0 +1,11 @@
+__default__:
+    account: account_id ##CHANGE THIS
+    partition: "short"
+    time: 60 # in min
+    threads: 1
+    mem: 2000 # in MB
+    output: /log_dir/%j.out ##CHANGE THIS. Log files for intermediate jobs, so a directory in scratch might work better.
+
+##E.g. to change the partition of rule pileup_by_region to medium, uncomment the following lines
+# pileup_by_region:
+#     partition: "medium"
