@@ -53,11 +53,11 @@ Some reference files are directly available in the `references` folder. For othe
 
 - **Reference genome regions**
 
-	The genome is separated into smaller regions for parallel computing. We have provided region files for both hg19 and hg38.
+	The genome is separated into smaller regions for parallel computing. We have provided region files for both [hg19](https://github.com/gldong/duplex-indel/blob/main/references/genome_regions_hg19.txt) and [hg38](https://github.com/gldong/duplex-indel/blob/main/references/genome_regions_hg38.txt).
 
 - **Genome mask**
 
-	High-quality regions of the genome for variant calling. We recommend using [UniMask](http://bit.ly/unimask) developed by Heng Li for hg19 and easy regions (i.e. not in difficult regions) from Genome In A Bottle (GIAB) for hg38.
+	High-quality regions of the genome for variant calling. We recommend using [UniMask](http://bit.ly/unimask) developed by Dr. Heng Li for [hg19](https://github.com/gldong/duplex-indel/blob/main/references/um75-hs37d5-comp.auto.bed) and easy regions (i.e. not in difficult regions) from Genome In A Bottle (GIAB) for hg38.
     ```bash
     # Download GIAB easy regions
     cd /path/to/duplex-indel/references
