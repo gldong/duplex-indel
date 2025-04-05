@@ -1,0 +1,12 @@
+sample_name: "SAMPLE_ID"
+base_dir: "/output_dir/SAMPLE_ID"
+fastq_R1: "/path/to/FASTQ_R1.fastq.gz"
+fastq_R2: "/path/to/FASTQ_R2.fastq.gz"
+bulk_bam: "/path/to/BULK.bam"
+bulk_bam_index: "/path/to/BULK.bam.bai"
+ref_fasta: "/path/to/duplex-indel/references/hs37d5.fa" #make sure other index files are in the same directory
+gnomad_file: "/path/to/duplex-indel/references/hg19_gnomad_genome_v2.0.1_indel_0.01.txt"
+ref_mask_bed: "/path/to/duplex-indel/references/um75-hs37d5-comp.auto.bed" #note this should contain the high quality regions
+barcodes_list: "/path/to/duplex-indel/references/META-CS_fwdrev_136_barcodes_list.txt"
+barcodes_dir: "/path/to/duplex-indel/references/barcodes"
+region_file: "/path/to/duplex-indel/references/genome_regions_hg19.txt" #split genome into smaller regions for pileup
