@@ -53,11 +53,11 @@ Some reference files are directly available in the `references` folder. For othe
 
 - **Reference genome regions**
 
-The genome is separated into smaller regions for parallel computing. We have provided region files for both hg19 and hg38.
+	The genome is separated into smaller regions for parallel computing. We have provided region files for both hg19 and hg38.
 
 - **Genome mask**
 
-High-quality regions of the genome for variant calling. We recommend using [UniMask](http://bit.ly/unimask) developed by Heng Li for hg19 and easy regions (i.e. not in difficult regions) from Genome In A Bottle (GIAB) for hg38.
+	High-quality regions of the genome for variant calling. We recommend using [UniMask](http://bit.ly/unimask) developed by Heng Li for hg19 and easy regions (i.e. not in difficult regions) from Genome In A Bottle (GIAB) for hg38.
     ```bash
     # Download GIAB easy regions
     cd /path/to/duplex-indel/references
@@ -67,7 +67,7 @@ High-quality regions of the genome for variant calling. We recommend using [UniM
 
 - **Reference genome**
 
-Make sure to use the same version as the bulk BAM. Generate necessary index files using the following command.
+	Make sure to use the same version as the bulk BAM. Generate necessary index files using the following command.
     ```bash
     cd /path/to/duplex-indel/references
     ```
@@ -94,7 +94,7 @@ Make sure to use the same version as the bulk BAM. Generate necessary index file
 
 - **Common indels**
 
-Download [gnomAD common indels](https://zenodo.org/records/15161320) (allele frequency >= 1%) to the `references` folder.
+	Download [gnomAD common indels](https://zenodo.org/records/15161320) (allele frequency >= 1%) to the `references` folder.
 
 ## Configure the run
 
