@@ -52,8 +52,11 @@ Duplex-indel supports both hg19 and hg38 alignments. Please make sure you are us
 Some reference files are directly available in the `references` folder. For others, follow the instructions to download them. 
 
 - **Reference genome regions**
+
 The genome is separated into smaller regions for parallel computing. We have provided region files for both hg19 and hg38.
+
 - **Genome mask**
+
 High-quality regions of the genome for variant calling. We recommend using [UniMask](http://bit.ly/unimask) developed by Heng Li for hg19 and easy regions (i.e. not in difficult regions) from Genome In A Bottle (GIAB) for hg38.
     ```bash
     # Download GIAB easy regions
@@ -61,7 +64,9 @@ High-quality regions of the genome for variant calling. We recommend using [UniM
     wget https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/genome-stratifications/v3.5/GRCh38@all/Union/GRCh38_notinalldifficultregions.bed.gz
     gunzip GRCh38_notinalldifficultregions.bed.gz
     ```
+
 - **Reference genome**
+
 Make sure to use the same version as the bulk BAM. Generate necessary index files using the following command.
     ```bash
     cd /path/to/duplex-indel/references
@@ -86,7 +91,9 @@ Make sure to use the same version as the bulk BAM. Generate necessary index file
     # Generate index files
     bwa index GCA_000001405.15_GRCh38_no_alt_analysis_set.fa
     ```
+
 - **Common indels**
+
 Download [gnomAD common indels](https://zenodo.org/records/15161320) (allele frequency >= 1%) to the `references` folder.
 
 ## Configure the run
