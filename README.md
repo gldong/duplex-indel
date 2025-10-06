@@ -1,10 +1,10 @@
-# duplex-indel
+# Duplex-Indel
 
-Duplex-indel is a pipeline for somatic insertions and deletions (indel) calling from Tn5 transposase-based duplex sequencing data. It is inspired by and expands on the core methods for SNV calling in META-CS, [pre-pe](https://github.com/lh3/pre-pe/) and [lianti](https://github.com/lh3/lianti/). We thank Dr. Heng Li and other contributors to those repositories. Given the single-molecule resolution of duplex sequencing, duplex-indel can accomodate both single-cell and pooled-cell input, and is applicable to polyploid tissues. 
+Duplex-Indel is a pipeline for somatic insertions and deletions (indel) calling from Tn5 transposase-based duplex sequencing data. It is inspired by and expands on the core methods for SNV calling in META-CS, [pre-pe](https://github.com/lh3/pre-pe/) and [lianti](https://github.com/lh3/lianti/). We thank Dr. Heng Li and other contributors to those repositories. Given the single-molecule resolution of duplex sequencing, Duplex-Indel can accomodate both single-cell and pooled-cell input, and is applicable to polyploid tissues. 
 
 ## Getting started
 
-Duplex-indel performs somatic indel calling by filtering out germline variants using matched bulk. Before running the pipeline, please make sure you have the following input data:
+Duplex-Indel performs somatic indel calling by filtering out germline variants using matched bulk. Before running the pipeline, please make sure you have the following input data:
 
 - `FASTQ` files of duplex sequencing reads (with strand barcodes in the reads)
 - `BAM` file of matched bulk WGS data
@@ -20,20 +20,20 @@ conda create -n mybase python=3.7  # skip if you have a python3 environment
 conda install -n mybase -c conda-forge mamba
 conda activate mybase
 ```
-Create a new environment for duplex-indel and install `snakemake`
+Create a new environment for Duplex-Indel and install `snakemake`
 ```bash
 mamba create -c conda-forge -c bioconda -n duplex-indel snakemake
 conda activate duplex-indel
 ```
 
-### 2. Install duplex-indel
+### 2. Install Duplex-Indel
 ```bash
 git clone https://github.com/gldong/duplex-indel.git
 cd duplex-indel && make
 ```
 
 ### 3. Install other required tools
-Duplex-indel requires `seqtk` and the `k8` javascript shell. 
+Duplex-Indel requires `seqtk` and the `k8` javascript shell. 
 ```bash
 # Install seqtk (under /path/to/duplex-indel)
 git clone https://github.com/lh3/seqtk.git;
@@ -47,7 +47,7 @@ cp k8-0.2.4/k8-`uname -s` k8
 
 ## Prepare reference files
 
-Duplex-indel supports both hg19 and hg38 alignments. Please make sure you are using the consistent version.
+Duplex-Indel supports both hg19 and hg38 alignments. Please make sure you are using the consistent version.
 
 Some reference files are directly available in the `references` folder. For others, follow the instructions to download them. 
 

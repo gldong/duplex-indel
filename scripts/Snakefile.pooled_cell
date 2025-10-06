@@ -18,7 +18,6 @@ region_file = config["region_file"]
 
 df = pd.read_table(barcodes_list, header = None)
 barcodes = df[0].values
-num_bams = 2*len(barcodes)
 num_bams= len(barcodes) 
 chromosomes = range(1,23)
 df = pd.read_table(region_file, header=None)
@@ -157,7 +156,7 @@ rule indel_calling:
     shell:
         "set -euo pipefail \n"
         "module load gcc/6.2.0 \n"
-        "k8 {pipeline_dir}/call_indel.js -T3 -B1 -a4 -s2 -v {input.gnomad_file} -u {input.vcf} > {base_dir}/{sample_name}.indel_calls.txt" #flt_lv[T]=3: any overlap btw indel and merged window
+        "k8 {pipeline_dir}/call_indel.js -T3 -B0.2 -a4 -s2 -v {input.gnomad_file} -u {input.vcf} > {base_dir}/{sample_name}.indel_calls.txt" #flt_lv[T]=3: any overlap btw indel and merged window
 
 
 

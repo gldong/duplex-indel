@@ -9,4 +9,5 @@ gnomad_file: "/path/to/duplex-indel/references/hg19_gnomad_genome_v2.0.1_indel_0
 ref_mask_bed: "/path/to/duplex-indel/references/um75-hs37d5-comp.auto.bed" #note this should contain the high quality regions
 barcodes_list: "/path/to/duplex-indel/references/META-CS_fwdrev_136_barcodes_list.txt"
 barcodes_dir: "/path/to/duplex-indel/references/barcodes"
+pipeline_dir: "/path/to/duplex-indel"
 region_file: "/path/to/duplex-indel/references/genome_regions_hg19.txt" #split genome into smaller regions for pileup
