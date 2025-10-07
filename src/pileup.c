@@ -173,6 +173,11 @@ static inline allele_t pileup2allele(const bam_pileup1_t *p, int min_baseQ, uint
 			if (bam_aux2i(YT) == 22) { // only record merging pos for LT_MERGE_PARTIAL=22 (LT_MERGE_COMPLETE doesn't affect indel calling)
 				uint8_t *ML, *MR;
 				ML = bam_aux_get(p->b, "ML"); MR = bam_aux_get(p->b, "MR"); 
+				if (ML == NULL || MR == NULL) {
+			        fprintf(stderr, "[ERROR] BAM record at position %d (read_idx=%d) is missing ML or MR tag.\n",
+			            p->b->core.pos, read_idx);
+			        exit(EXIT_FAILURE);  // exit the whole program
+			    }
 				a.mergedl = a.posl + bam_aux2i(ML); // extract merged window from new tag
 				a.mergedr = a.posl + bam_aux2i(MR);
 				// adjust aligned position based on cigar
