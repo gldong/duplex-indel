@@ -29,7 +29,8 @@ print(sample_name)
 
 rule all:
     input:
-        final_calls=base_dir + "/" + sample_name + ".indel_calls.txt",
+        final_calls = base_dir + "/" + sample_name + ".indel_calls.vcf",
+        final_calls_summary = base_dir + "/" + sample_name + ".indel_calls.summary.txt",
         pre_mem_no_merging_bam = base_dir + "/" + sample_name + ".unmerged.mem.bam",
         pre_mem_no_merging_bam_index = base_dir + "/" + sample_name + ".unmerged.mem.bam.bai"
 
@@ -152,11 +153,11 @@ rule indel_calling:
         runtime = 120, 
         mem_mb = 3000 
     output:
-        final_calls = base_dir + "/" + sample_name + ".indel_calls.txt"
+        final_calls = base_dir + "/" + sample_name + ".indel_calls.vcf",
+        final_calls_summary = base_dir + "/" + sample_name + ".indel_calls.summary.txt"
     shell:
         "set -euo pipefail \n"
         "module load gcc/6.2.0 \n"
-        "k8 {pipeline_dir}/call_indel.js -T3 -B0.8 -a4 -s2 -v {input.gnomad_file} -u {input.vcf} > {base_dir}/{sample_name}.indel_calls.txt" #flt_lv[T]=3: any overlap btw indel and merged window
-
+        "python {pipeline_dir}/call_indel.py -T3 -B0.8 -a4 -s2 -v {input.gnomad_file} -u -o {base_dir}/{sample_name}.indel_calls.vcf {input.vcf} > {base_dir}/{sample_name}.indel_calls.summary.txt" #flt_lv[T]=3: any overlap btw indel and merged window
 
 
