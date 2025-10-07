@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #-----------------------------------------------
-# Filter: multiple Tn5 sites
+# Filter: unique Tn5 site
 #-----------------------------------------------
 # Filter out variants with multiple Tn5 sites (under the same barcode pair)
 

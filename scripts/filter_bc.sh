@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #-----------------------------------------------
-# Filter: multiple barcode pairs sites
+# Filter: unique barcode pair
 #-----------------------------------------------
 # Filter out variants covered by multiple barcode pairs
 

@@ -20,9 +20,9 @@ conda create -n mybase python=3.7  # skip if you have a python3 environment
 conda install -n mybase -c conda-forge mamba
 conda activate mybase
 ```
-Create a new environment for Duplex-Indel and install `snakemake`
+Create a new environment for Duplex-Indel and install `snakemake` and `pysam`
 ```bash
-mamba create -c conda-forge -c bioconda -n duplex-indel snakemake
+mamba create -c conda-forge -c bioconda -n duplex-indel snakemake pysam
 conda activate duplex-indel
 ```
 
@@ -33,16 +33,12 @@ cd duplex-indel && make
 ```
 
 ### 3. Install other required tools
-Duplex-Indel requires `seqtk` and the `k8` javascript shell. 
+Duplex-Indel requires `seqtk`. 
 ```bash
 # Install seqtk (under /path/to/duplex-indel)
 git clone https://github.com/lh3/seqtk.git;
 cd seqtk && make
 cd ..
-
-# Install k8 javascript shell (under /path/to/duplex-indel)
-curl -L https://github.com/attractivechaos/k8/releases/download/v0.2.4/k8-0.2.4.tar.bz2 | tar -jxf -
-cp k8-0.2.4/k8-`uname -s` k8
 ```
 
 ## Prepare reference files
@@ -133,6 +129,29 @@ sbatch -o LOG_DIR/SAMPLE_ID.%j run_pipeline.sh single SAMPLE_ID
 sbatch -o LOG_DIR/SAMPLE_ID.%j run_pipeline.sh pooled SAMPLE_ID
 
 # Note that "%j" is the job ID assigned on the cluster.
+```
+
+## [OPTIONAL] Apply post-calling filters
+
+We also provide a few optional filters that the user can customize according to each specific use case, including:
+
+1) Additional filtering of variants confounded by read merging using unmerged BAM [-m]
+
+2) Filtering by unique Tn5 sites present at each variant [-t]
+
+3) Filtering by unique barcode pairs covering each variant [-b] 
+
+4) Additional filtering of variants based on their position towards the end of the read (default = 10) [-e <int>]
+
+To apply one or multiple of these filters, use the following command:
+```bash
+bash apply_filters.sh -s SAMPLE_ID -c CONFIG_FILE -d SAMPLE_DIR [-m] [-t] [-b] [-e <int>]
+```
+
+Example:
+```bash
+# Apply filters for reading merging and variant position
+bash apply_filters.sh -s SAMPLE_ID -c CONFIG_FILE -d SAMPLE_DIR -m -e 15
 ```
 
 

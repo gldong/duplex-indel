@@ -13,8 +13,8 @@ usage() {
   echo "  -c <config_file>  Config file [required]"
   echo "  -d <sample_dir>   Output directory for this sample [required]"
   echo "  -m                Enable read merging filter"
-  echo "  -t                Enable multiple Tn5 filter"
-  echo "  -b                Enable multiple barcode filter"
+  echo "  -t                Enable unique Tn5 site filter"
+  echo "  -b                Enable unique barcode pair filter"
   echo "  -e <int>          Enable read end filter within the last <int> bp from the end of the read"
   echo "  -h                Show help message and exit"
 }
@@ -65,8 +65,8 @@ fi
 echo "SAMPLE_ID: ${SAMPLE_ID}"
 echo "Applying filters for: "
 if [ ${FILTER_MERG} ]; then echo "--read merging"; fi
-if [ ${FILTER_TN5} ]; then echo "--multiple Tn5 sites"; fi
-if [ ${FILTER_BC} ]; then echo "--multiple barcode pairs"; fi
+if [ ${FILTER_TN5} ]; then echo "--unique Tn5 site"; fi
+if [ ${FILTER_BC} ]; then echo "--unique barcode pair"; fi
 if [ ${FILTER_READEND} ]; then echo "--read end"; fi
 
 SCRIPT_DIR=scripts
@@ -85,20 +85,20 @@ bash ${SCRIPT_DIR}/filter_merg.sh ${SAMPLE_ID} ${SAMPLE_BULK} ${SAMPLE_DIR} ${RE
 
 
 #-----------------------------------------------
-# Filter: multiple Tn5 sites
+# Filter: unique Tn5 site
 #-----------------------------------------------
 # Filter out variants with multiple Tn5 sites (under the same barcode pair)
 
-echo "Apply multiple Tn5 sites filter..."
+echo "Apply unique Tn5 site filter..."
 bash ${SCRIPT_DIR}/filter_tn5.sh ${SAMPLE_DIR}
 
 
 #-----------------------------------------------
-# Filter: multiple barcode pairs sites
+# Filter: unique barcode pair
 #-----------------------------------------------
 # Filter out variants covered by multiple barcode pairs
 
-echo "Apply multiple barcode pairs filter..."
+echo "Apply unique barcode pair filter..."
 bash ${SCRIPT_DIR}/filter_bc.sh ${SAMPLE_ID} ${SAMPLE_DIR}
 
 
