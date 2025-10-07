@@ -131,9 +131,9 @@ sbatch -o LOG_DIR/SAMPLE_ID.%j run_pipeline.sh pooled SAMPLE_ID
 # Note that "%j" is the job ID assigned on the cluster.
 ```
 
-## [OPTIONAL] Apply post-calling filters
+### [OPTIONAL] Apply post-calling filters
 
-We also provide a few optional filters that the user can customize according to each specific use case, including:
+We also provide a few optional filters which can be customized for specific use cases, including:
 
 1) Additional filtering of variants confounded by read merging using unmerged BAM [-m]
 
