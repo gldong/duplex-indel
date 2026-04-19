@@ -90,7 +90,7 @@ bash ${SCRIPT_DIR}/filter_merg.sh ${SAMPLE_ID} ${SAMPLE_BULK} ${SAMPLE_DIR} ${RE
 # Filter out variants with multiple Tn5 sites (under the same barcode pair)
 
 echo "Apply unique Tn5 site filter..."
-bash ${SCRIPT_DIR}/filter_tn5.sh ${SAMPLE_DIR}
+bash ${SCRIPT_DIR}/filter_tn5.sh ${SAMPLE_ID} ${SAMPLE_DIR}
 
 
 #-----------------------------------------------
@@ -119,47 +119,90 @@ bash ${SCRIPT_DIR}/filter_readend.sh ${SAMPLE_ID} ${SAMPLE_DIR} ${FILTER_READEND
 echo "Combine filters..."
 
 OUTPUT_SUFFIX=filtered
-FILE1=""
-FILE2=""
+FILE1_DS=""
+FILE2_DS=""
+FILE1_SS=""
+FILE2_SS=""
+
 if [ ${FILTER_MERG} ]; then 
   OUTPUT_SUFFIX+="_merg"
-  if [ -z ${FILE1} ]; then FILE1=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_merg.vcf; fi
-fi
-if [ ${FILTER_TN5} ]; then 
-  OUTPUT_SUFFIX+="_tn5"
-  if [ -z ${FILE1} ]; then 
-    FILE1=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_tn5.vcf
-  else
-    FILE2=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_tn5.vcf
-    grep -f ${FILE1} ${FILE2} > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
-    FILE1=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
-    FILE2=""
+  
+  if [ -z ${FILE1_DS} ]; then 
+    FILE1_DS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_merg.vcf
   fi
-fi
-if [ ${FILTER_BC} ]; then 
-  OUTPUT_SUFFIX+="_bc"
-  if [ -z ${FILE1} ]; then 
-    FILE1=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_tn5.vcf
-  else
-    FILE2=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_tn5.vcf
-    grep -f ${FILE1} ${FILE2} > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
-    FILE1=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
-    FILE2=""
-  fi
-fi
-if [ ${FILTER_READEND} ]; then 
-  OUTPUT_SUFFIX+="_readend"
-  if [ -z ${FILE1} ]; then 
-    FILE1=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_tn5.vcf
-  else
-    FILE2=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_tn5.vcf
-    grep -f ${FILE1} ${FILE2} > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
-    FILE1=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
-    FILE2=""
+
+  if [ -z ${FILE1_SS} ]; then 
+    FILE1_SS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.filtered_merg.vcf
   fi
 fi
 
-echo "Final filtered output: ${FILE1}"
+if [ ${FILTER_TN5} ]; then 
+  OUTPUT_SUFFIX+="_tn5"
+  
+  if [ -z ${FILE1_DS} ]; then 
+    FILE1_DS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_tn5.vcf
+  else
+    FILE2_DS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_tn5.vcf
+    grep -f ${FILE1_DS} ${FILE2_DS} > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
+    FILE1_DS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
+    FILE2_DS=""
+  fi
+  
+  if [ -z ${FILE1_SS} ]; then 
+    FILE1_SS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.filtered_tn5.vcf
+  else
+    FILE2_SS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.filtered_tn5.vcf
+    grep -f ${FILE1_SS} ${FILE2_SS} > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.${OUTPUT_SUFFIX}.vcf
+    FILE1_SS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.${OUTPUT_SUFFIX}.vcf
+    FILE2_SS=""
+  fi
+fi
+
+if [ ${FILTER_BC} ]; then 
+  OUTPUT_SUFFIX+="_bc"
+  
+  if [ -z ${FILE1_DS} ]; then 
+    FILE1_DS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_bc.vcf
+  else
+    FILE2_DS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_bc.vcf
+    grep -f ${FILE1_DS} ${FILE2_DS} > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
+    FILE1_DS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
+    FILE2_DS=""
+  fi
+
+  if [ -z ${FILE1_SS} ]; then 
+    FILE1_SS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.filtered_bc.vcf
+  else
+    FILE2_SS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.filtered_bc.vcf
+    grep -f ${FILE1_SS} ${FILE2_SS} > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.${OUTPUT_SUFFIX}.vcf
+    FILE1_SS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.${OUTPUT_SUFFIX}.vcf
+    FILE2_SS=""
+  fi
+fi
+
+if [ ${FILTER_READEND} ]; then 
+  OUTPUT_SUFFIX+="_readend"
+  
+  if [ -z ${FILE1_DS} ]; then 
+    FILE1_DS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_readend.vcf
+  else
+    FILE2_DS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.filtered_readend.vcf
+    grep -f ${FILE1_DS} ${FILE2_DS} > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
+    FILE1_DS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
+    FILE2_DS=""
+  fi
+
+  if [ -z ${FILE1_SS} ]; then 
+    FILE1_SS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.filtered_readend.vcf
+  else
+    FILE2_SS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.filtered_readend.vcf
+    grep -f ${FILE1_SS} ${FILE2_SS} > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.${OUTPUT_SUFFIX}.vcf
+    FILE1_SS=${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.${OUTPUT_SUFFIX}.vcf
+    FILE2_SS=""
+  fi
+fi
+
+echo "Final filtered output: ${FILE1_DS} ${FILE1_SS}"
 
 
 

@@ -14,15 +14,15 @@ SAMPLE_ID <- args[3]
 output_suffix <- args[4]
 
 # Extract original ds and ss calls
-indel_calls <- read.csv(input_f, header=FALSE, skip=13, sep=c("\t", " "), na.strings="")
-ds_calls <- indel_calls[indel_calls$V1 == "NV",c(2:5)]
-ss_calls <- indel_calls[indel_calls$V1 == "DV",c(2:5)]
+indel_calls <- read.table(pipe(paste("grep -v '^#'", input_f)), header=FALSE, sep="\t", na.strings="", quote="")
+ds_calls <- indel_calls[grepl("VT=DS", indel_calls$V8), c(1, 2, 4, 5)]
+ss_calls <- indel_calls[grepl("VT=SS", indel_calls$V8), c(1, 2, 4, 5)]
 
 # Apply filter to ds and ss calls
 filtered_ds_calls <- c()
 if (nrow(ds_calls)!=0) {
 	for (j in 1:nrow(ds_calls)){
-		vcf <- read.table(sprintf("%s/%s/indel_candidates_unmerged/NV_%s_%s.vcf",base_dir,SAMPLE_ID,ds_calls$V2[j],ds_calls$V3[j]), header=F, skip=97, sep="\t")
+		vcf <- read.table(sprintf("%s/%s/indel_candidates_unmerged/DS_%s_%s.vcf",base_dir,SAMPLE_ID,ds_calls$V1[j],ds_calls$V2[j]), header=F, skip=97, sep="\t")
 		if (grepl("1/1",vcf$V11)){ #if indel also exists in unmerged bam
 			filtered_ds_calls <- rbind(filtered_ds_calls, ds_calls[j,])
 		}
@@ -31,7 +31,7 @@ if (nrow(ds_calls)!=0) {
 filtered_ss_calls <- c()
 if (nrow(ss_calls)!=0) {
 	for (j in 1:nrow(ss_calls)){
-		vcf <- read.table(sprintf("%s/%s/indel_candidates_unmerged/DV_%s_%s.vcf",base_dir,SAMPLE_ID,ss_calls$V2[j],ss_calls$V3[j]), header=F, skip=97, sep="\t")
+		vcf <- read.table(sprintf("%s/%s/indel_candidates_unmerged/SS_%s_%s.vcf",base_dir,SAMPLE_ID,ss_calls$V1[j],ss_calls$V2[j]), header=F, skip=97, sep="\t")
 		if (grepl("1/0",vcf$V11)|grepl("0/1",vcf$V11)) {
 			filtered_ss_calls <- rbind(filtered_ss_calls, ss_calls[j,])
 		}

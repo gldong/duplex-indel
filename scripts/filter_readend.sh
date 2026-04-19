@@ -5,7 +5,8 @@
 #-----------------------------------------------
 # Filter out variants within <int> bp from the end of the read
 
-module load gcc/14.2.0 htslib/1.21 bcftools/1.21
+# Uncomment the line below for cluster computing, otherwise make sure you have these tools installed
+# module load gcc/14.2.0 htslib/1.21 bcftools/1.21
 
 # Parse arguments
 SAMPLE_ID=$1
@@ -14,7 +15,7 @@ CUTOFF=$3
 OUTPUT_SUFFIX=filtered_readend
 
 # Extract ds variant pos on the read and filter variant if pos <= CUTOFF
-cat ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.txt | grep ^NV | awk '{ split($9,BC,":"); printf("%s\t%s\t%s\n", $2, $3, BC[1])}' > ${SAMPLE_DIR}/ds_region_with_BC_bam.txt
+cat ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.vcf | awk '!/^#/ && $8 ~ /VT=DS/ { split($10,BC,":"); printf("%s\t%s\t%s\n", $1, $2, BC[1])}' > ${SAMPLE_DIR}/ds_region_with_BC_bam.txt
 echo -e "##fileformat=VCFv4.0\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO" > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ds.${OUTPUT_SUFFIX}.vcf
 if [ -s ${SAMPLE_DIR}/ds_region_with_BC_bam.txt ]; then # if no ds calls, write empty VCF
   while IFS=$'\t' read -r -a array
@@ -29,7 +30,7 @@ if [ -s ${SAMPLE_DIR}/ds_region_with_BC_bam.txt ]; then # if no ds calls, write 
 fi
 
 # Extract ss variant pos on the read and filter variant if pos <= CUTOFF
-cat ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.txt | grep ^DV | awk '{ split($9,BC,":"); printf("%s\t%s\t%s\n", $2, $3, BC[1])}' > ${SAMPLE_DIR}/ss_region_with_BC_bam.txt
+cat ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.vcf | awk '!/^#/ && $8 ~ /VT=SS/ { split($10,BC,":"); printf("%s\t%s\t%s\n", $1, $2, BC[1])}' > ${SAMPLE_DIR}/ss_region_with_BC_bam.txt
 echo -e "##fileformat=VCFv4.0\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO" > ${SAMPLE_DIR}/${SAMPLE_ID}.indel_calls.ss.${OUTPUT_SUFFIX}.vcf
 if [ -s ${SAMPLE_DIR}/ss_region_with_BC_bam.txt ]; then # if no ss calls, write empty VCF
   while IFS=$'\t' read -r -a array

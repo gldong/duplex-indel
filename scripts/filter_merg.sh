@@ -5,7 +5,8 @@
 #-----------------------------------------------
 # Filter out variants that are not verified in unmerged bam (pile up of unmerged bam at variant candidate sites)
 
-module load gcc/14.2.0 R/4.4.0 samtools/1.21 htslib/1.21 bcftools/1.21
+# Uncomment the line below for cluster computing, otherwise make sure you have these tools installed
+# module load gcc/14.2.0 R/4.4.0 samtools/1.21 htslib/1.21 bcftools/1.21
 
 SAMPLE_ID=$1
 bulk_bam=$2
@@ -18,7 +19,7 @@ output_suffix=filtered_merg
 echo ${SAMPLE_ID} ${bulk_bam}
 
 # Extract variant site with barcode for pileup
-input_f=${base_dir}/${SAMPLE_ID}.indel_calls.txt
+input_f=${base_dir}/${SAMPLE_ID}.indel_calls.vcf
 output_f=${base_dir}/indel_candidates.txt
 Rscript ${script_dir}/filter_merg_extract_candidates.R ${input_f} ${output_f}
 

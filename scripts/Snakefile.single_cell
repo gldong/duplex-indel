@@ -49,7 +49,7 @@ rule preprocess:
         pre_mem_bam_index = base_dir + "/" + sample_name + ".mem.bam.bai"
     shell:
         "set -euo pipefail \n"
-        "module load gcc/6.2.0 bwa/0.7.17 samtools/1.13 sambamba/0.7.1 \n"
+        "module load gcc/14.2.0 bwa/0.7.18 samtools/1.21 sambamba/0.7.1 \n"
         "ulimit -S -n 4096 \n"
         "seqtk mergepe {input.fastq_R1} {input.fastq_R2} | "
         "{pipeline_dir}/preprocess - | bwa mem -Cpt{threads} {input.ref_fasta} - | samtools view -uS - | "
@@ -71,7 +71,7 @@ rule preprocess_no_merging:
         pre_mem_no_merging_bam_index = base_dir + "/" + sample_name + ".unmerged.mem.bam.bai"
     shell:
         "set -euo pipefail \n"
-        "module load gcc/6.2.0 bwa/0.7.17 samtools/1.13 sambamba/0.7.1 \n"
+        "module load gcc/14.2.0 bwa/0.7.18 samtools/1.21 sambamba/0.7.1 \n"
         "ulimit -S -n 4096 \n"
         "seqtk mergepe {input.fastq_R1} {input.fastq_R2} | "
          "{pipeline_dir}/preprocess-no-merging - | bwa mem -Cpt{threads} {input.ref_fasta} - | samtools view -uS - | "
@@ -93,7 +93,7 @@ rule split_bams:
         barcode_bam = expand(base_dir+"/barcode_bams/{{bam_name}}.{barcode}.bam", barcode=barcodes),
         barcode_bai = expand(base_dir+"/barcode_bams/{{bam_name}}.{barcode}.bam.bai", barcode=barcodes)
     shell:
-        "module load gcc/6.2.0 samtools/1.13 \n"
+        "module load gcc/14.2.0 samtools/1.21 \n"
         "BCs=( {params.BCs} ) \n"
         "files=( {input.barcode_files} ) \n"
         "for i in ${{!BCs[@]}}; do \n"
@@ -116,7 +116,7 @@ rule merge_pileup:
     output:
         sample_vcf=base_dir + "/" + sample_name + ".vcf.gz"
     shell:
-        "module load gcc/6.2.0 htslib/1.9.0 bcftools/1.9 \n"
+        "module load gcc/14.2.0 htslib/1.21 bcftools/1.21 \n"
         "bcftools concat -Oz -o {base_dir}/{sample_name}.vcf.gz {input.sample_vcf_by_region} && "
         "bcftools index -t {base_dir}/{sample_name}.vcf.gz && "
         "rm {input.sample_vcf_by_region}"
@@ -140,7 +140,7 @@ rule pileup_by_region:
     output:
         sample_vcf_by_region = base_dir + "/" + sample_name + ".region{region_num}.vcf"
     shell:
-        "module load gcc/6.2.0 htslib/1.9.0 bcftools/1.9 \n"
+        "module load gcc/14.2.0 htslib/1.21 bcftools/1.21 \n"
         "{pipeline_dir}/pileup -r {params.region_arg} -nL{num_bams} -P20 -b {input.ref_mask_bed} -C -q20,30 -Q20,30 -s4 -c -v -f {input.ref_fasta} {input.bulk_bam} {params.merged_bams} > {base_dir}/{sample_name}.region{wildcards.region_num}.vcf"
 
 
@@ -157,7 +157,7 @@ rule indel_calling:
         final_calls_summary = base_dir + "/" + sample_name + ".indel_calls.summary.txt"
     shell:
         "set -euo pipefail \n"
-        "module load gcc/6.2.0 \n"
-        "python {pipeline_dir}/call_indel.py -T3 -B0.8 -a4 -s2 -v {input.gnomad_file} -u -o {base_dir}/{sample_name}.indel_calls.vcf {input.vcf} > {base_dir}/{sample_name}.indel_calls.summary.txt" #flt_lv[T]=3: any overlap btw indel and merged window
+        "module load gcc/14.2.0 \n"
+        "python {pipeline_dir}/call_indel.py -T1 -a4 -s2 -v {input.gnomad_file} -u -o {base_dir}/{sample_name}.indel_calls.vcf {input.vcf} > {base_dir}/{sample_name}.indel_calls.summary.txt" #flt_lv[T]=1: filter when exact overlap btw indel and merged window
 
 
