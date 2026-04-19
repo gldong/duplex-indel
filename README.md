@@ -28,7 +28,7 @@ conda activate duplex-indel
 
 ### 2. Install Duplex-Indel
 ```bash
-git clone https://github.com/gldong/duplex-indel.git
+git clone https://github.com/ealee-lab/duplex-indel.git
 cd duplex-indel && make
 ```
 
@@ -49,11 +49,11 @@ Some reference files are directly available in the `references` folder. For othe
 
 - **Reference genome regions**
 
-	The genome is separated into smaller regions for parallel computing. We have provided region files for both [hg19](https://github.com/gldong/duplex-indel/blob/main/references/genome_regions_hg19.txt) and [hg38](https://github.com/gldong/duplex-indel/blob/main/references/genome_regions_hg38.txt).
+	The genome is separated into smaller regions for parallel computing. We have provided region files for both [hg19](https://github.com/ealee-lab/duplex-indel/blob/main/references/genome_regions_hg19.txt) and [hg38](https://github.com/ealee-lab/duplex-indel/blob/main/references/genome_regions_hg38.txt).
 
 - **Genome mask**
 
-	High-quality regions of the genome for variant calling. We recommend using [UniMask](http://bit.ly/unimask) developed by Dr. Heng Li for [hg19](https://github.com/gldong/duplex-indel/blob/main/references/um75-hs37d5-comp.auto.bed) and easy regions (i.e. not in difficult regions) from Genome In A Bottle (GIAB) for hg38.
+	High-quality regions of the genome for variant calling. We recommend using [UniMask](http://bit.ly/unimask) developed by Dr. Heng Li for [hg19](https://github.com/ealee-lab/duplex-indel/blob/main/references/um75-hs37d5-comp.auto.bed) and easy regions (i.e. not in difficult regions) from Genome In A Bottle (GIAB) for hg38.
     ```bash
     # Download GIAB easy regions
     cd /path/to/duplex-indel/references
@@ -94,7 +94,7 @@ Some reference files are directly available in the `references` folder. For othe
 
 ## Configure the run
 
-A YAML file is required as the configuration for each run (i.e. each sample). We have provided example YAML files in the `scripts` folder for [hg19](https://github.com/gldong/duplex-indel/blob/main/scripts/config_hg19.yaml) and [hg38](https://github.com/gldong/duplex-indel/blob/main/scripts/config_hg38.yaml), which you can modify with your input file paths. 
+A YAML file is required as the configuration for each run (i.e. each sample). We have provided example YAML files in the `scripts` folder for [hg19](https://github.com/ealee-lab/duplex-indel/blob/main/scripts/config_hg19.yaml) and [hg38](https://github.com/ealee-lab/duplex-indel/blob/main/scripts/config_hg38.yaml), which you can modify with your input file paths. 
 
 ## Run pipeline
 
@@ -115,7 +115,7 @@ In practice, processing duplex sequencing data requires cluster computing. An ex
 
 ### Cluster configuration
 
-You can find example cluster configurations in the `scripts` folder for [single-cell](https://github.com/gldong/duplex-indel/tree/main/scripts/slurm.single_cell) and [pooled-cell](https://github.com/gldong/duplex-indel/tree/main/scripts/slurm.pooled_cell) input. 
+You can find example cluster configurations in the `scripts` folder for [single-cell](https://github.com/ealee-lab/duplex-indel/tree/main/scripts/slurm.single_cell) and [pooled-cell](https://github.com/ealee-lab/duplex-indel/tree/main/scripts/slurm.pooled_cell) input. 
 
 ### Run pipeline (sbatch)
 ```bash
