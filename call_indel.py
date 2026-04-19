@@ -34,17 +34,17 @@ def parse_args():
 	parser.add_argument('-o', required=True, help='Output VCF file')
 
 	# Duplex-specific filters
-	parser.add_argument('-a', type=int, default=5, help='Min ALT read depth in total to call a double-stranded mutation')
+	parser.add_argument('-a', type=int, default=4, help='Min ALT read depth in total to call a double-stranded mutation')
 	parser.add_argument('-s', type=int, default=2, help='Min ALT read depth per strand to call a double-stranded mutation')
 	parser.add_argument('-S', type=int, default=4, help='Min strand depth at candidate single-stranded sites')
-	parser.add_argument('-B', type=float, default=0.2, help='Min ALT allele balance')
+	parser.add_argument('-B', type=float, default=0.8, help='Min ALT allele balance')
 	parser.add_argument('-j', type=int, default=2, help='Min allele depth to call joint mutations')
 	parser.add_argument('-J', type=int, default=1, help='Min allele depth on both strands for joint mutations')
 	parser.add_argument('-l', type=int, default=1, help='Max conflicting duplex reads')
 	parser.add_argument('-L', type=int, default=10, help='Min distance towards read end')
 	parser.add_argument('-w', type=int, default=100, help='Window size to filter clustered mutations')
 	parser.add_argument('-R', type=int, default=0, help='Max REF read depth at mutation site')
-	parser.add_argument('-T', type=int, choices=[1, 2, 3], default=3, help='Filtering stringency level (1=most strict, 3=least)')
+	parser.add_argument('-T', type=int, choices=[1, 2, 3], default=3, help='Filtering stringency level (1=least filtering, 3=most)')
 
 	# Bulk-specific filters
 	parser.add_argument('-D', type=int, default=20, help='Min bulk read depth')
@@ -289,20 +289,6 @@ def print_calls(vcf_out, output_sample_name, x, sample_meta, show_flt, min_joint
 				"MGR": str(c['max_mg_end']) if c['max_mg_end']>0 else "."
 			})
 
-	# VCF output
-	# rec = vcf_out.new_record(
-	# 	contig=x['ctg'],
-	# 	start=x['pos'] - 1, #pysam expects 0-based
-	# 	stop=start + len(x['ref']),
-	# 	alleles=(x['ref'], x['alt']),
-	# 	id='.',
-	# 	qual=None,
-	# 	filter='PASS' if not x['flt'] else 'LowQual'
-	# )
-	# # Set INFO
-	# rec.info['BDP'] = ",".join(map(str, bulk_ad))
-	# vt = "."
-	# nbc = 0
 
 	def write_with(vt, sample_hits):
 		rec = vcf_out.new_record(
@@ -330,65 +316,6 @@ def print_calls(vcf_out, output_sample_name, x, sample_meta, show_flt, min_joint
 	if sample_hit_ds: write_with("DS", sample_hit_ds)
 	if sample_hit_ss: write_with("SS", sample_hit_ss)
 	if sample_hit_joint: write_with("JOINT", sample_hit_joint)
-
-
-	# if sample_hit_ds: 
-	# 	vt = "DS"
-	# 	nbc = len(sample_hit_ds)
-	# 	rec.info['VT'] = vt
-	# 	rec.info['NBC'] = nbc
-	# 	# Set FORMAT
-	# 	rec.samples[output_sample_name]["BC"] = ";".join([hit[0] for hit in sample_hit_ds])
-	# 	rec.samples[output_sample_name]["ADF"] = ";".join([hit[1] for hit in sample_hit_ds])
-	# 	rec.samples[output_sample_name]["ADR"] = ";".join([hit[2] for hit in sample_hit_ds])
-	# 	rec.samples[output_sample_name]["NTN"] = ";".join([hit[3] for hit in sample_hit_ds])
-	# 	rec.samples[output_sample_name]["TN"] = ";".join([hit[4] for hit in sample_hit_ds])
-	# 	rec.samples[output_sample_name]["MGL"] = ";".join([hit[5] for hit in sample_hit_ds])
-	# 	rec.samples[output_sample_name]["MGR"] = ";".join([hit[6] for hit in sample_hit_ds])
-	# 	# Write record
-	# 	vcf_out.write(rec)
-	# if sample_hit_ss: 
-	# 	vt = "SS"
-	# 	nbc = len(sample_hit_ss)
-	# 	rec.info['VT'] = vt
-	# 	rec.info['NBC'] = nbc
-	# 	# Set FORMAT
-	# 	rec.samples[output_sample_name]["BC"] = ";".join([hit[0] for hit in sample_hit_ss])
-	# 	rec.samples[output_sample_name]["ADF"] = ";".join([hit[1] for hit in sample_hit_ss])
-	# 	rec.samples[output_sample_name]["ADR"] = ";".join([hit[2] for hit in sample_hit_ss])
-	# 	rec.samples[output_sample_name]["NTN"] = ";".join([hit[3] for hit in sample_hit_ss])
-	# 	rec.samples[output_sample_name]["TN"] = ";".join([hit[4] for hit in sample_hit_ss])
-	# 	rec.samples[output_sample_name]["MGL"] = ";".join([hit[5] for hit in sample_hit_ss])
-	# 	rec.samples[output_sample_name]["MGR"] = ";".join([hit[6] for hit in sample_hit_ss])
-	# 	# Write record
-	# 	vcf_out.write(rec)
-	# if sample_hit_joint: 
-	# 	vt = "JOINT"
-	# 	nbc = len(sample_hit_joint)
-	# 	rec.info['VT'] = vt
-	# 	rec.info['NBC'] = nbc
-	# 	# Set FORMAT
-	# 	rec.samples[output_sample_name]["BC"] = ";".join([hit[0] for hit in sample_hit_joint])
-	# 	rec.samples[output_sample_name]["ADF"] = ";".join([hit[1] for hit in sample_hit_joint])
-	# 	rec.samples[output_sample_name]["ADR"] = ";".join([hit[2] for hit in sample_hit_joint])
-	# 	rec.samples[output_sample_name]["NTN"] = ";".join([hit[3] for hit in sample_hit_joint])
-	# 	rec.samples[output_sample_name]["TN"] = ";".join([hit[4] for hit in sample_hit_joint])
-	# 	rec.samples[output_sample_name]["MGL"] = ";".join([hit[5] for hit in sample_hit_joint])
-	# 	rec.samples[output_sample_name]["MGR"] = ";".join([hit[6] for hit in sample_hit_joint])
-	# 	# Write record
-	# 	vcf_out.write(rec)
-	# rec.info['VT'] = vt
-	# rec.info['NBC'] = nbc
-	# # Set FORMAT
-	# rec.samples[output_sample_name]["BC"] = ";".join([hit[0] for hit in sample_hit])
-	# rec.samples[output_sample_name]["ADF"] = ";".join([hit[1] for hit in sample_hit])
-	# rec.samples[output_sample_name]["ADR"] = ";".join([hit[2] for hit in sample_hit])
-	# rec.samples[output_sample_name]["NTN"] = ";".join([hit[3] for hit in sample_hit])
-	# rec.samples[output_sample_name]["TN"] = ";".join([hit[4] for hit in sample_hit])
-	# rec.samples[output_sample_name]["MGL"] = ";".join([hit[5] for hit in sample_hit])
-	# rec.samples[output_sample_name]["MGR"] = ";".join([hit[6] for hit in sample_hit])
-	# # Write record
-	# vcf_out.write(rec)
 
 
 def main():
@@ -686,7 +613,7 @@ def main():
 		for i, c in enumerate(BC_samples):
 			if c is None:
 				continue
-			# If sample is haploid and it has ref alleles, c.flt will be true
+			# If sample is haploid and it has ref alleles, c['flt'] will be true
 			c['alt'] = (not c['flt'] and
 						c['ad'][1] >= min_dp_alt and
 						c['adf'][1] >= min_dp_alt_strand and
@@ -865,6 +792,8 @@ def main():
 		print('DC', *corr_dmg, sep='\t')
 
 	# Sensitivity
+	# binary: by het bulk site, count site as detected if any BC-pair detects it
+	# FNR: by BC-pair, may double count the same site if covered by multiple BC pairs
 	print('Sensitivity_binary', n_het_bulk_detected, n_het_bulk, f"{(n_het_bulk_detected/max(1,n_het_bulk)):.4f}", sep='\t')
 	sum_fnr = sum(float(x) for x in fnr) if fnr else 0.0
 	print('Sensitivity_FNR', len(fnr), f"{sum_fnr:.4f}", f"{(len(fnr) - sum_fnr):.4f}", sep='\t')
